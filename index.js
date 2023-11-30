@@ -19,14 +19,60 @@ const server = http.createServer((req, res) => {
   }
   else if(req.url==='/api')
   {
-      fs.readFile(path.join(__dirname,'/public','db.json'),(err,data)=>{
-          if (err) throw err;
-          res.writeHead(200,{'Content-Type':'application/json'})
-          res.end(data);
-      })
+    //https://www.mongodb.com/blog/post/quick-start-nodejs-mongodb-how-to-get-connected-to-your-database 
+const {MongoClient} = require('mongodb');
+
+ 
+async function main(){
+    /**
+     * Connection URI. Update <username>, <password>, and <your-cluster-url> to reflect your cluster.
+     * See https://docs.mongodb.com/ecosystem/drivers/node/ for more details
+     */
+    const uri ="mongodb+srv://vadlamudisai1:Jaswanth3579@webtrail.o1tsui4.mongodb.net/?retryWrites=true&w=majority"
+ 
+
+    const client = new MongoClient(uri);
+      try {
+        // Connect to the MongoDB cluster
+        await client.connect();
+ 
+
+        await findsomedata(client);
 
 
-  }
+        // Find the listing named "Infinite Views" that we created in create.js
+        //await findOneListingByName(client, "Ribeira Charming Duplex");
+ 
+    } catch (e) {
+        console.error(e);
+    } finally {
+        await client.close();
+    }
+
+main().catch(console.error);
+
+
+async function findsomedata(client ){
+    const cursor = client.db("Grocery_store").collection("Groceries").find({});
+    const results = await cursor.toArray();
+    console.log(results);
+
+};
+
+
+    }
+ 
+    
+// async function findOneListingByName( client, nameOfListing){
+//     const result = await client.db("sample_airbnb").collection("listingsAndReviews").findOne({ name: nameOfListing });
+//     if (result) {
+//         console.log(`Found a listing in the collection with the name '${nameOfListing}':`);
+//         console.log(result);
+//     } else {
+//         console.log(`No listings found with the name '${nameOfListing}'`);
+//     }
+}
+
   else {
     // Serve static files from the "public" directory
     const filePath = path.join(__dirname, 'public', req.url);
